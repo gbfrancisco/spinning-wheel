@@ -1,5 +1,6 @@
 <template>
   <Pie
+    @chart:rendered="test"
     :chart-options="chartOptions"
     :chart-data="chartData"
     :chart-id="chartId"
@@ -9,6 +10,7 @@
     :styles="styles"
     :width="width"
     :height="height"
+    ref="wheel"
   />
 </template>
 
@@ -66,6 +68,11 @@ export default {
         maintainAspectRatio: false,
       },
     };
+  },
+  methods: {
+    test() {
+      console.log(this.$refs.wheel.chart);
+    },
   },
 };
 </script>

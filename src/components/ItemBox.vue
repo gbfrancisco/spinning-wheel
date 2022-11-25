@@ -1,22 +1,34 @@
 <template>
   <q-card class="item-box-container text-white">
     <q-card-section>
-      <div class="text-h5 text-center">List of Stuff</div>
+      <div v-if="spinButtonVisibility === 0" class="text-h5 text-center">
+        Add items
+      </div>
+      <div v-if="spinButtonVisibility === 1" class="text-h5 text-center">
+        Add 1 more item
+      </div>
+      <div v-if="spinButtonVisibility === 2" class="text-h5 text-center">
+        <q-btn class="text-h6 bg-primary">SPIN!</q-btn>
+      </div>
     </q-card-section>
 
     <q-card-section class="item-box-items-container">
-      <item
+      <div
         v-for="(item, idx) in filteredItemList"
-        @remove-item="handleRemoveItem"
         :key="item"
-        :itemIndex="idx"
-        :itemName="item"
-        class="item-element"
-      />
+        ref="itemRef"
+        class="item-ref"
+      >
+        <item
+          @remove-item="handleRemoveItem"
+          :itemIndex="idx"
+          :itemName="item"
+          class="item-element"
+        />
+      </div>
     </q-card-section>
 
     <q-separator dark />
-
     <q-card-section class="item-box-actions-container flex justify-center">
       <q-input
         v-model="itemInput"
@@ -42,6 +54,7 @@
 </template>
 
 <script>
+import { nextTick } from "@vue/runtime-core";
 import Item from "./Item.vue";
 
 export default {
@@ -56,12 +69,41 @@ export default {
     filteredItemList() {
       return [...new Set(this.itemList)];
     },
+    spinButtonVisibility() {
+      const length = this.filteredItemList.length;
+
+      // 0 - enable spin button
+      if (length >= 2) {
+        return 2;
+      }
+
+      // 1 - add one more item
+      if (length === 1) {
+        return 1;
+      }
+
+      // 2 - add items
+      if (length === 0) {
+        return 0;
+      }
+    },
   },
   methods: {
-    addItem(itemName) {
+    async addItem(itemName) {
       if (itemName) {
+        // get length before adding item for comparison later
+        const initialLength = this.itemList.length;
         this.itemList = this.filterDuplicates([...this.itemList, itemName]);
+        const newLength = this.itemList.length;
+
+        // clear input
         this.itemInput = "";
+
+        // only do logic below if an item has been added
+        if (initialLength !== newLength) {
+          await nextTick();
+          this.$refs.itemRef[newLength - 1].scrollIntoView();
+        }
       }
     },
     filterDuplicates(arr) {
@@ -86,8 +128,9 @@ export default {
   background-color: $blue-9;
 }
 .item-box-items-container {
-  flex-grow: 1;
   background-color: $blue-3;
+  flex-grow: 1;
+  overflow-y: auto;
 }
 .item-box-title {
   color: white;
@@ -97,7 +140,7 @@ export default {
 .item-container {
   flex-grow: 1;
 }
-.item-element:not(:last-child) {
+.item-ref:not(:last-child) {
   margin-bottom: 10px;
 }
 .item-input-container {
