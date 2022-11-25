@@ -1,7 +1,7 @@
 <template>
   <div class="item flex justify-between q-pa-sm">
     <div class="item-text text-h6">{{ itemName }}</div>
-    <q-btn class="bg-primary">
+    <q-btn @click="handleRemoveItem" class="bg-primary">
       <q-icon name="clear" />
     </q-btn>
   </div>
@@ -13,6 +13,15 @@ export default {
     itemName: {
       type: String,
       required: true,
+    },
+    itemIndex: {
+      type: Number,
+      required: true,
+    },
+  },
+  methods: {
+    handleRemoveItem() {
+      this.$emit("removeItem", this.itemIndex);
     },
   },
 };

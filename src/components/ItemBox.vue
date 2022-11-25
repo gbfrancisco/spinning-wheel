@@ -5,7 +5,14 @@
     </q-card-section>
 
     <q-card-section class="item-box-items-container">
-      <item v-for="(item, idx) in itemList" :key="idx" :itemName="item" />
+      <item
+        v-for="(item, idx) in filteredItemList"
+        @remove-item="handleRemoveItem"
+        :key="item"
+        :itemIndex="idx"
+        :itemName="item"
+        class="item-element"
+      />
     </q-card-section>
 
     <q-separator dark />
@@ -13,14 +20,23 @@
     <q-card-section class="item-box-actions-container flex justify-center">
       <q-input
         v-model="itemInput"
+        @keydown.enter.prevent="addItem(itemInput)"
         bg-color="white"
         dense
         :input-style="{ fontWeight: '500' }"
         outlined
         placeholder="Item Name"
       />
-      <q-btn class="bg-blue-7 q-pa-sm q-mx-sm" flat>Add Item</q-btn>
-      <q-btn class="bg-blue-7 q-pa-sm" flat>Remove All</q-btn>
+      <q-btn
+        @click.prevent="addItem(itemInput)"
+        class="bg-blue-7 q-pa-sm q-mx-sm"
+        flat
+      >
+        Add Item
+      </q-btn>
+      <q-btn @click.prevent="removeAllListItems" class="bg-blue-7 q-pa-sm" flat>
+        Remove All
+      </q-btn>
     </q-card-section>
   </q-card>
 </template>
@@ -33,8 +49,30 @@ export default {
   data() {
     return {
       itemInput: "",
-      itemList: ["test", "test1", "test2"],
+      itemList: [],
     };
+  },
+  computed: {
+    filteredItemList() {
+      return [...new Set(this.itemList)];
+    },
+  },
+  methods: {
+    addItem(itemName) {
+      if (itemName) {
+        this.itemList = this.filterDuplicates([...this.itemList, itemName]);
+        this.itemInput = "";
+      }
+    },
+    filterDuplicates(arr) {
+      return [...new Set(arr)];
+    },
+    removeAllListItems() {
+      this.itemList = [];
+    },
+    handleRemoveItem(index) {
+      this.itemList.splice(index, 1);
+    },
   },
 };
 </script>
@@ -58,6 +96,9 @@ export default {
 }
 .item-container {
   flex-grow: 1;
+}
+.item-element:not(:last-child) {
+  margin-bottom: 10px;
 }
 .item-input-container {
   display: flex;
