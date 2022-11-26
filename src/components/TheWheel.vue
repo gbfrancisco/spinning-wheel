@@ -1,6 +1,5 @@
 <template>
   <Pie
-    @chart:rendered="test"
     :chart-options="chartOptions"
     :chart-data="chartData"
     :chart-id="chartId"
@@ -17,6 +16,7 @@
 <script>
 import { Pie } from "vue-chartjs";
 import { Chart as ChartJS, Title, ArcElement } from "chart.js";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 
 ChartJS.register(Title, ArcElement);
 
@@ -26,6 +26,9 @@ export default {
     chartId: {
       type: String,
       default: "pie-chart",
+    },
+    labelProp: {
+      required: true,
     },
     datasetIdKey: {
       type: String,
@@ -47,31 +50,38 @@ export default {
       type: Object,
       default: () => {},
     },
-    plugins: {
-      type: Array,
-      default: () => [],
-    },
   },
   data() {
     return {
-      chartData: {
-        labels: ["VueJs", "EmberJs", "ReactJs", "AngularJs"],
-        datasets: [
-          {
-            backgroundColor: ["#41B883", "#E46651", "#00D8FF", "#DD1B16"],
-            data: [40, 20, 80, 10],
-          },
-        ],
-      },
-      chartOptions: {
-        responsive: true,
-        maintainAspectRatio: false,
-      },
+      plugins: [ChartDataLabels],
     };
   },
-  methods: {
-    test() {
-      console.log(this.$refs.wheel.chart);
+  computed: {
+    chartData() {
+      return {
+        labels: this.labelProp,
+        datasets: [
+          {
+            backgroundColor: ["#1976d2", "#1e88e5"],
+            data: this.labelProp.map((e) => 1),
+          },
+        ],
+      };
+    },
+    chartOptions() {
+      return {
+        animation: { duration: 0 },
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          datalabels: {
+            color: "#ffffff",
+            formatter: (_, context) =>
+              context.chart.data.labels[context.dataIndex],
+            font: { size: 16 },
+          },
+        },
+      };
     },
   },
 };

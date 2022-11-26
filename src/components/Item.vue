@@ -21,7 +21,7 @@ export default {
   },
   methods: {
     handleRemoveItem() {
-      this.$emit("removeItem", this.itemIndex);
+      this.$emit("remove-item", this.itemIndex);
     },
   },
 };

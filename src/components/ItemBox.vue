@@ -103,6 +103,7 @@ export default {
         if (initialLength !== newLength) {
           await nextTick();
           this.$refs.itemRef[newLength - 1].scrollIntoView();
+          this.$emit("added-item", this.itemList);
         }
       }
     },
@@ -111,9 +112,14 @@ export default {
     },
     removeAllListItems() {
       this.itemList = [];
+      this.$emit("removed-all-items", this.itemList);
     },
     handleRemoveItem(index) {
-      this.itemList.splice(index, 1);
+      // Used filter instead of splice due to weird behavior
+      this.itemList = this.itemList.filter(
+        (e) => this.itemList.indexOf(e) !== index
+      );
+      this.$emit("removed-item", this.itemList);
     },
   },
 };

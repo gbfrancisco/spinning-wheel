@@ -5,10 +5,18 @@
     </div>
     <div class="app-body row">
       <div class="wheel-container col justify-center">
-        <the-wheel :height="525" :width="525" />
+        <the-wheel
+          :height="525"
+          :width="525"
+          :labelProp="computedWheelLabelProps"
+        />
       </div>
       <div class="board-container col justify-center">
-        <item-box />
+        <item-box
+          @added-item="setWheelLabelProp"
+          @removed-item="setWheelLabelProp"
+          @removed-all-items="setWheelLabelProp"
+        />
       </div>
     </div>
   </div>
@@ -23,10 +31,26 @@ export default {
   data() {
     return {
       counter: 0,
+      wheelLabelProps: [],
     };
   },
-  computed: {},
-  methods: {},
+  computed: {
+    computedWheelLabelProps() {
+      return this.wheelLabelProps.length > 1
+        ? this.wheelLabelProps
+        : ["Enter 2 items"];
+    },
+  },
+  methods: {
+    setWheelLabelProp(itemList) {
+      this.wheelLabelProps = itemList;
+    },
+  },
+  watch: {
+    wheelLabelProps() {
+      // console.log(this.wheelLabelProps, "wtffff???");
+    },
+  },
 };
 </script>
 
